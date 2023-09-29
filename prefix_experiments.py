@@ -33,6 +33,8 @@ for p in range(len(prefixes)):
 
 mlta = 5
 
+special_case_div_symbol = ['kg/s','m/s','g/m^3','kg/m^3','m/s^2']
+
 units =  {
     '':         vec([0,0,0,0,0]),
     'g':        vec([1,0,0,0,0]),
@@ -51,7 +53,7 @@ units =  {
     'g/m^3':    vec([1,-3,0,0,0]),
     'kg/m^3':   vec([1,-3,0,0,0]),
     'm/s^2':    vec([0,1,-2,0,0]),
-    's^2':      vec([0,0,-2,0,0]),
+    's^2':      vec([0,0,2,0,0]),
     'g_earth':  vec([0,1,-2,0,0]),
     'c (speed of light)': vec([0,1,-1,0,0]),
     'atm' :     vec([1,1-2,-2,0,0]),
@@ -110,10 +112,15 @@ special_cases = {'g':.001,'g/m^3':.001,'lbf':4.44822,'lb':4.44822,
     'minute':60,'hour':60*60,'day':60*60*24,'year':3.154*10**7, 'c (speed of light)':299792458,'liter':0.001,'gallon':0.00378541,'Density of Water':999.8395,'atm':101325,'psi':6894.76,'degrees':0.0174533,'rotations':np.pi*2,'AU':1.495978*10**11,'RPM':0.15915,'in':.3048/12,
 }
 
+unitslist = list(units.items())
 
+units = {us[0].replace(' ',''):us[1] for us in unitslist}
+special_cases_list = list(special_cases.items())
+
+special_cases = {us[0].replace(' ',''):us[1] for us in special_cases_list}
 
 def get_len(key):
-    return len(key[0])
+    return -len(key[0])
 test_dict = units
  
 # sorting using sort()
@@ -136,6 +143,26 @@ def find_p(v):
         c = prefixes[p]
         vc = v/c
 
+        if vc<best and vc>=.99:
+            prefix = p
+            best = vc+0
+    return prefix
+
+def find_p_imp(v):
+    print('***************',v)
+    best = 100000000000000
+    prefix = ''
+    # v = round(v,6)
+    
+    
+    if v > .01 and v < 10000:
+        return ''
+    for p in list(prefixes2):
+    
+        c = prefixes2[p]
+        vc = v/c
+        
+        #print('v',v,'c',c,'vc',vc,'best',best,'p',p)
         if vc<best and vc>=.99:
             prefix = p
             best = vc+0
@@ -168,8 +195,21 @@ def interms_str(a,b):
             return num
         else:
             return num+'/'+den
+    
+def interms_str_imp(a,b):
+    X = b
+    # a = ['g','m','s','A','K']
+    num = ''
+    for x in range(mlta):
+        if X[x] == 1:
+            num += (a[x]+' *')
+        if X[x] != 0:
+            num += (' '+a[x]+'^'+str(int(X[x]))+' *')
+    if num != '':
+        if num[-1]=='*':
+            num = num[0:-1]
 
-    return st
+    return num
 
 class Value:
     def __init__(self):
@@ -231,19 +271,40 @@ class Value:
         #     v = v ** (3)
         return v
     
-
+    def in_terms_imperial(self):
+        unit = ''
+        
+        for u in reversed(list(units)):
+           
+            if (self.mlta_vector == units[u]).all():
+                
+                unit = u
+                break
+            
+        return (unit)
+    
+    def show_in_terms_imp(self):
+        u = self.in_terms_imperial()
+        v = self.get_value_in_terms(u)
+        if u == '':
+            u = interms_str_imp(['slug','ft','s','A','K'],self.mlta_vector)
+            v *= np.prod(vec([14.59390,0.3048,1,1,5/9])**self.mlta_vector)
+            
+        p = find_p_imp(v)
+        v /= prefixes2[p]
+        
+        return str(round(v,5))+p+u
     
     def show_in_terms(self):
         
+       
         u = self.in_terms_metric()
         
+        v = self.get_value_in_terms(u)
+
         if u == '':
             u = interms_str(['g','m','s','A','K'],self.mlta_vector)
-            
         
-        
-        v = self.get_value_in_terms(u)
-        print('V ',v,v**(1/3))
         if u == 'm^3':
             p = find_p(v**(1/3))
         else:
@@ -256,13 +317,17 @@ class Value:
             v/=prefixes[p]
             v/=prefixes[p]
         
-        print(round(v,5),p+u)
-        
+        #print(round(v,5),p+u)
+        return str(round(v,5))+p+u
     
 
 import re
 
 def break_into_terms(a):
+
+    for x in special_case_div_symbol:
+        a = a.replace(x,x.replace('/','per'))
+        
     terms=[]
     for e in a.split('*'):
         if e:
@@ -276,6 +341,7 @@ def break_into_terms(a):
     
     for t in range(len(terms)):
         terms[t] = terms[t].replace(' ', '')
+        terms[t] = terms[t].replace('per','/')
     return terms
 
 def convert(terms):
@@ -312,9 +378,9 @@ def convert(terms):
         # UNITS
         
         un = ''
-        for u in range(len(units)):
+        for u in range(len(res)):
             
-            key = list(units)[u]
+            key = list(res)[u]
             
             t_l = len(t)
             
