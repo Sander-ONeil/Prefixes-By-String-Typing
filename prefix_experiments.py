@@ -22,7 +22,7 @@ prefixes ={
     '':1,
 }
 
-prefixes2 = {'':1, **{'*10^'+str(x)+' ':10**x  for x in range(-10,10)}}
+prefixes2 = {'':1, **{'*10^'+str(x)+' ':10**x  for x in range(-16,16)}}
 
 for p in range(len(prefixes)):
     ind = list(prefixes)[p]
@@ -47,6 +47,7 @@ units =  {
     'm/s':      vec([0,1,-1,0,0]),
     'm^3':      vec([0,3,0,0,0]),
     'liter':    vec([0,3,0,0,0]),
+    'mol/L':    vec([0,-3,0,0,0]),
     
     
     'Pa':       vec([1,1-2,-2,0,0]),
@@ -74,6 +75,9 @@ units =  {
     'F':        vec([-1,-2,4,2,0]),
     'degrees':  vec([0,0,0,0,0]),
     'rotations':vec([0,0,0,0,0]),
+    'pi':       vec([0,0,0,0,0]),
+    '°':        vec([0,0,0,0,0]),
+    'pc':       vec([0,1,0,0,0]),
     'AU':       vec([0,1,0,0,0]),
     
     'lb_mass':  vec([1,0,0,0,0]),
@@ -84,37 +88,74 @@ units =  {
     'lb':      vec([1,1,-2,0,0]),
     's':        vec([0,0,1,0,0]),
     'minute':   vec([0,0,1,0,0]),
+    'min':   vec([0,0,1,0,0]),
     'hour':     vec([0,0,1,0,0]),
+    'hr':       vec([0,0,1,0,0]),
     'day':      vec([0,0,1,0,0]),
+    'yr':     vec([0,0,1,0,0]),
     'year':     vec([0,0,1,0,0]),
+    
+    'rpm':      vec([0,0,-1,0,0]),
     'RPM':      vec([0,0,-1,0,0]),
     'mph':      vec([0,1,-1,0,0]),
     'gallon':   vec([0,3,0,0,0]),
     'hp':       vec([1,2,-3,0,0]),
     'psi':      vec([1,1-2,-2,0,0]),
-    
-    
-    
-    
-    
-    
-    
+    ' ':         vec([0,0,0,0,0]),
     
     #'heatflux':vec([0,-1,0,0,-1])+vec([1,2,-3,0,0]),#w/m*kelvin
     #'conductivity':vec([0,-2,0,0,0])+vec([1,2,-3,0,0]),#watts/meter^2
     }
+
+
+
+
+
+
 
 special_case_grams = ['g','g/m^3']
 
 
 special_cases = {'g':.001,'g/m^3':.001,'lbf':4.44822,'lb':4.44822,
     'hp':745.7,'ft':.3048,'lb_mass':0.453592,'g_earth':9.80665,'mph':.44704,'mile':1609.34,
-    'minute':60,'hour':60*60,'day':60*60*24,'year':3.154*10**7, 'c (speed of light)':299792458,'liter':0.001,'gallon':0.00378541,'Density of Water':999.8395,'atm':101325,'psi':6894.76,'degrees':0.0174533,'rotations':np.pi*2,'AU':1.495978*10**11,'RPM':0.15915,'in':.3048/12,
+    'minute':60,'min':60,'hour':60*60,'hr':60*60,'day':60*60*24,'year':3.154*10**7,'yr':3.154*10**7, 'c (speed of light)':299792458,'liter':0.001,'gallon':0.00378541,'Density of Water':999.8395,'atm':101325,'psi':6894.76,'degrees':np.pi*2/360,'°':np.pi*2/360,'rotations':np.pi*2,'AU':1.495978*10**11,'RPM':2*np.pi/60,'rpm':2*np.pi/60,'in':.3048/12,'pi':np.pi,'pc':3.0857e16,'mol/L':1000*6.02214076e+23
 }
+
+
+imp_units = units.copy()
+
+
+badunitsforimperialdisplay = ['rotations','degrees','pi']
+for x in badunitsforimperialdisplay:
+    del imp_units[x]
+
+
+synonyms = {'rotations':'rot','°':'degrees','hour':'hours','yr':'years','gallon':'gallons','mile':'miles'}
+
+for s in synonyms:
+    print(s)
+    
+    s2 = synonyms[s]
+    special_cases[s2] = special_cases[s]
+    units[s2] = units[s]
+
+
+
+imp_unitslist = list(imp_units.items())
+
+imp_units = {us[0].replace(' ',''):us[1] for us in imp_unitslist}
+
+
+
 
 unitslist = list(units.items())
 
 units = {us[0].replace(' ',''):us[1] for us in unitslist}
+
+
+
+
+
 special_cases_list = list(special_cases.items())
 
 special_cases = {us[0].replace(' ',''):us[1] for us in special_cases_list}
@@ -149,7 +190,7 @@ def find_p(v):
     return prefix
 
 def find_p_imp(v):
-    print('***************',v)
+    
     best = 100000000000000
     prefix = ''
     # v = round(v,6)
@@ -174,16 +215,16 @@ def interms_str(a,b):
     num = ''
     for x in range(mlta):
         if X[x] > 0:
-            num += (a[x]+'*')*int(X[x])
+            num += (a[x]+'×')*int(X[x])
     if num != '':
-        if num[-1]=='*':
+        if num[-1]=='×':
             num = num[0:-1]
     den = ''
     for x in range(mlta):
         if X[x] < 0:
-            den += (a[x]+'*')*int(-X[x])
+            den += (a[x]+'×')*int(-X[x])
     if den != '':
-        if den[-1]=='*':
+        if den[-1]=='×':
             den = den[0:-1]
     if num == '':
         if den == '':
@@ -194,19 +235,19 @@ def interms_str(a,b):
         if den =='':
             return num
         else:
-            return num+'/'+den
+            return num+'/'+'('+den+')'
     
 def interms_str_imp(a,b):
     X = b
     # a = ['g','m','s','A','K']
-    num = ''
+    num = ' '
     for x in range(mlta):
         if X[x] == 1:
-            num += (a[x]+' *')
-        if X[x] != 0:
-            num += (' '+a[x]+'^'+str(int(X[x]))+' *')
-    if num != '':
-        if num[-1]=='*':
+            num += (' '+a[x]+' ×')
+        elif X[x] != 0:
+            num += (' '+a[x]+'^'+str(int(X[x]))+' ×')
+    if num != ' ':
+        if num[-1]=='×':
             num = num[0:-1]
 
     return num
@@ -274,8 +315,9 @@ class Value:
     def in_terms_imperial(self):
         unit = ''
         
-        for u in reversed(list(units)):
-           
+        
+        
+        for u in reversed(list(imp_units)):
             if (self.mlta_vector == units[u]).all():
                 
                 unit = u
@@ -327,6 +369,11 @@ def break_into_terms(a):
 
     for x in special_case_div_symbol:
         a = a.replace(x,x.replace('/','per'))
+    
+    a = a.replace('×','*')
+    
+    a = a.replace('÷','/')
+    a = a.replace('to','/')
         
     terms=[]
     for e in a.split('*'):

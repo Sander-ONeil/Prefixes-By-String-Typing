@@ -34,12 +34,12 @@ label.grid(row=1, column=0, pady=20, padx=20, sticky="ew")
 imperial_label = tk.Label(root, text='imperial', font=("Arial", 20)) # Font adjusted to make text bigger
 imperial_label.grid(row=2, column=0, pady=20, padx=20, sticky="ew")
 
-button_text = ['c (speed of light)','Density of Water','g_earth']
+button_text = ['×','÷','c (speed of light)','Density of Water','g_earth','°']
 
 for i, t in enumerate(button_text):
     
-    b = tk.Button(root, text=t, command=lambda: insert_character(t))
-    b.grid(row=i%2, column=1+i//2, pady=5, padx=5)  # Grid
+    tk.Button(root, text=t, command=lambda t=t: insert_character(t)).grid(row=i%2, column=1+i//2, pady=5, padx=5)
+  # Grid
 
 # Ensure column 0 takes all extra space
 root.grid_columnconfigure(0, weight=1)
