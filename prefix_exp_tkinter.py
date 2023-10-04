@@ -24,33 +24,40 @@ def insert_character(char):
     entry.insert(tk.END, char)  # Insert the character at the end of the entry
     on_key(None)  # Update the result
 
+
+m = 7
 root = tk.Tk()
 root.title('Live Text Display')
 
 entry = tk.Entry(root,font=("Arial", 20),width=52)
-entry.grid(row=0, column=0, pady=20, padx=20, sticky="ew",) # Grid placement for entry
+entry.grid(row=m+0, column=0, pady=20, padx=20, sticky="ew",columnspan = 5) # Grid placement for entry
 entry.bind('<KeyRelease>', on_key)
 
 label = tk.Label(root, text='metric', font=("Arial", 20)) # Font adjusted to make text bigger
-label.grid(row=1, column=0, pady=20, padx=20, sticky="ew")
+label.grid(row=m+1, column=0, pady=20, padx=20, sticky="ew",columnspan = 5)
 imperial_label = tk.Label(root, text='imperial', font=("Arial", 20)) # Font adjusted to make text bigger
-imperial_label.grid(row=2, column=0, pady=20, padx=20, sticky="ew")
+imperial_label.grid(row=m+2, column=0, pady=20, padx=20, sticky="ew",columnspan = 5)
 
 
 
 
-button_text = ['×','÷','°','μ','π','Ω','c (speed of light)','Density of Water','g_earth','molarity','G (gravitational constant)','ε_0']
+button_text = ['×','÷','°','μ','π','Ω','ε_0','c (speed of light)','Density of Water','g_earth','molarity','G (gravitational constant)','Planck_length',
+    'Planck_mass',
+    'Planck_time',
+    'Planck_temperature',
+
+]
 
 
 
 
 for i, t in enumerate(button_text):
     
-    tk.Button(root, text=t, command=lambda t=t: insert_character(t)).grid(row=i%3, column=1+i//3, pady=5, padx=5)
+    tk.Button(root, text=t, command=lambda t=t: insert_character(t)).grid(row=i%m, column=0+i//m, pady=5, padx=5)
   # Grid
 
 # Ensure column 0 takes all extra space
-root.grid_columnconfigure(0, weight=1)
+#root.grid_columnconfigure(0, weight=1)
 
 
 root.mainloop()

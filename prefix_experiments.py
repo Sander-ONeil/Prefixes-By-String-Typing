@@ -30,8 +30,8 @@ prefixes ={
     'y': '0.000000000000000000000001',
     'r':1e-27,
     'q':1e-30,
-
-    '':1,
+    
+    '':1,**{'*10^'+str(x)+' ':10**x  for x in range(-50,-33)}
 }
 
 prefixes2 = {'':1, **{'*10^'+str(x)+' ':10**x  for x in range(-46,46)}}
@@ -94,7 +94,15 @@ units =  {
     '°':        vec([0,0,0,0,0]),
     'pc':       vec([0,1,0,0,0]),
     'AU':       vec([0,1,0,0,0]),
+    
+    
     'eV':       vec([1,2,-2,0,0]),
+    'Å':        vec([0,1,0,0,0]),
+    'Planck_length':vec([0,1,0,0,0]),
+    'Planck_mass':vec([1,0,0,0,0]),
+    'Planck_time':vec([0,0,1,0,0]),
+    'Planck_temperature':vec([0,0,0,1,0]),
+    
     
     'yard':     vec([0,1,0,0,0]),
     'Football Field':vec([0,1,0,0,0]),
@@ -126,6 +134,8 @@ units =  {
     'e':        vec([0,0,1,1,0]),
     'Btu':      vec([1,2,-2,0,0]),
     'cal':      vec([1,2,-2,0,0]),
+    '°F':       vec([0,0,0,0,1]),
+    
     
     #'heatflux':vec([0,-1,0,0,-1])+vec([1,2,-3,0,0]),#w/m*kelvin
     #'conductivity':vec([0,-2,0,0,0])+vec([1,2,-3,0,0]),#watts/meter^2
@@ -185,6 +195,13 @@ special_cases = {
     'e':            1.602176634e-19,
     'Btu':          1.0551e3,
     'cal':          4.184,
+    '°F':           5/9,
+    'Å':            1e-10,
+    'Planck_length':1.6162553e-35,
+    'Planck_mass':2.176434e-8,
+    'Planck_time':5.391247e-44,
+    'Planck_temperature':1.416784e32,
+    
 }
 
 
