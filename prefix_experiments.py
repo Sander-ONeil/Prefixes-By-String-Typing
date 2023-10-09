@@ -159,7 +159,7 @@ special_cases = {
     'ft':           .3048,
     'lb_mass':      0.453592,
     'g_earth':      9.80665,
-    'mph':          44704,
+    'mph':          .44704,
     'mile':         1609.34,
     'minute':       60,
     'min':          60,
