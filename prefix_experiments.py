@@ -33,8 +33,26 @@ prefixes ={
     
     '':1,**{'*10^'+str(x)+' ':10**x  for x in range(-50,-33)}
 }
+superscript_map = {
+    '-': "\u207b",
+    '0': "\u2070",
+    '1': "\u00b9",
+    '2': "\u00b2",
+    '3': "\u00b3",
+    '4': "\u2074",
+    '5': "\u2075",
+    '6': "\u2076",
+    '7': "\u2077",
+    '8': "\u2078",
+    '9': "\u2079"
+}
 
-prefixes2 = {'':1, **{'*10^'+str(x)+' ':10**x  for x in range(-46,46)}}
+def to_superscript(number):
+    return ''.join([superscript_map[char] for char in str(number)])
+
+prefixes2 = {'': 1, **{'×10' + to_superscript(x) + ' ': 10**x for x in range(-46, 46)}}
+
+prefixescon = {'':1, **{'e'+str(x)+' ':10**x  for x in range(-46,46)}}
 
 for p in range(len(prefixes)):
     ind = list(prefixes)[p]
@@ -45,7 +63,7 @@ for p in range(len(prefixes)):
 
 mlta = 5
 
-special_case_div_symbol = ['kg/s','m/s','g/m^3','kg/m^3','m/s^2']
+special_case_div_symbol = ['kg/s','m/s','g/m\u00b3','kg/m\u00b3','m/s\u00b2']
 
 units =  {
     '':         vec([0,0,0,0,0]),
@@ -57,19 +75,21 @@ units =  {
     'A':        vec([0,0,0,1,0]),
     'K':        vec([0,0,0,0,1]),
     'm/s':      vec([0,1,-1,0,0]),
-    'm^3':      vec([0,3,0,0,0]),
+    
+    'm\u00b2':      vec([0,2,0,0,0]),
+    'm\u00b3':      vec([0,3,0,0,0]),
     'liter':    vec([0,3,0,0,0]),
     'molarity': vec([0,-3,0,0,0]),
-    'G (gravitational constant)': vec([-1,3,-2,0,0]),
+    'G_gravitational constant': vec([-1,3,-2,0,0]),
     
     
     'Pa':       vec([1,1-2,-2,0,0]),
-    'g/m^3':    vec([1,-3,0,0,0]),
-    'kg/m^3':   vec([1,-3,0,0,0]),
-    'm/s^2':    vec([0,1,-2,0,0]),
-    's^2':      vec([0,0,2,0,0]),
+    'g/m\u00b3':    vec([1,-3,0,0,0]),
+    'kg/m\u00b3':   vec([1,-3,0,0,0]),
+    'm/s\u00b2':    vec([0,1,-2,0,0]),
+    's\u00b2':      vec([0,0,2,0,0]),
     'g_earth':  vec([0,1,-2,0,0]),
-    'c (speed of light)': vec([0,1,-1,0,0]),
+    'c_speed of light': vec([0,1,-1,0,0]),
     'atm' :     vec([1,1-2,-2,0,0]),
     'Density of Water':vec([1,-3,0,0,0]),
     'amu':      vec([1,0,0,0,0]),
@@ -78,7 +98,7 @@ units =  {
     'hz':       vec([0,0,-1,0,0]),
     
     'W':        vec([1,2,-3,0,0]),
-    'T(tesla)': vec([1,0,-2,-1,0]),
+    'T_tesla': vec([1,0,-2,-1,0]),
     'C':        vec([0,0,1,1,0]),
     'V':        vec([1,2,-3,-1,0]),
     'J':        vec([1,2,-2,0,0]),
@@ -94,7 +114,9 @@ units =  {
     '°':        vec([0,0,0,0,0]),
     'pc':       vec([0,1,0,0,0]),
     'AU':       vec([0,1,0,0,0]),
-    
+    'earth_circumference':vec([0,1,0,0,0]),
+    'R_earth':vec([0,1,0,0,0]),
+    'acre':     vec([0,2,0,0,0]),
     
     'eV':       vec([1,2,-2,0,0]),
     'Å':        vec([0,1,0,0,0]),
@@ -122,6 +144,8 @@ units =  {
     'yr':       vec([0,0,1,0,0]),
     'year':     vec([0,0,1,0,0]),
     
+    'Age_of_universe':vec([0,0,1,0,0]),
+    
     'rpm':      vec([0,0,-1,0,0]),
     'RPM':      vec([0,0,-1,0,0]),
     'mph':      vec([0,1,-1,0,0]),
@@ -129,13 +153,15 @@ units =  {
     'hp':       vec([1,2,-3,0,0]),
     'psi':      vec([1,1-2,-2,0,0]),
     ' ':        vec([0,0,0,0,0]),
-    'Coulomb constant': vec([1,1+2,-2,0,0])+2*vec([0,0,1,1,0]),
+    'Coulomb constant': vec([1,1+2,-2,0,0])-2*vec([0,0,1,1,0]),
     'ε_0':      vec([-1,-2-1,4,2,0]),
     'e':        vec([0,0,1,1,0]),
     'Btu':      vec([1,2,-2,0,0]),
     'cal':      vec([1,2,-2,0,0]),
     '°F':       vec([0,0,0,0,1]),
-    
+    'H_0':      vec([0,0,-1,0,0]),
+    'mass_sun': vec([1,0,0,0,0]),
+    'mass_earth': vec([1,0,0,0,0]),
     
     #'heatflux':vec([0,-1,0,0,-1])+vec([1,2,-3,0,0]),#w/m*kelvin
     #'conductivity':vec([0,-2,0,0,0])+vec([1,2,-3,0,0]),#watts/meter^2
@@ -147,19 +173,19 @@ units =  {
 
 
 
-special_case_grams = ['g','g/m^3']
+special_case_grams = ['g','g/m\u00b3']
 
 
 special_cases = {
     'g':            .001,
-    'g/m^3':        .001,
+    'g/m\u00b3':        .001,
     'lbf':          4.44822,
     'lb':           4.44822,
     'hp':           745.7,
     'ft':           .3048,
     'lb_mass':      0.453592,
     'g_earth':      9.80665,
-    'mph':          .44704,
+    'mph':          0.44704,
     'mile':         1609.34,
     'minute':       60,
     'min':          60,
@@ -168,7 +194,7 @@ special_cases = {
     'day':          60*60*24,
     'year':         3.154*10**7,
     'yr':           3.154*10**7,
-    'c (speed of light)':299792458,
+    'c_speed of light':299792458,
     'liter':        0.001,
     'gallon':       0.00378541,
     'Density of Water':999.8395,
@@ -186,7 +212,7 @@ special_cases = {
     'molarity':     1000*6.02214076e+23,
     'mole':         1000*6.02214076e+23,
     'eV':           1.602176634e-19,
-    'G (gravitational constant)': 6.67430e-11,
+    'G_gravitational constant': 6.67430e-11,
     'yard':         .3048*3,
     'Football Field':.3048*3*100,
     'amu':          1.66053906660e-27,
@@ -201,6 +227,13 @@ special_cases = {
     'Planck_mass':2.176434e-8,
     'Planck_time':5.391247e-44,
     'Planck_temperature':1.416784e32,
+    'acre'         :4046.8564224,
+    'earth_circumference':40075000,
+    'R_earth':6.37813e6,
+    'H_0':1/(4.55e17),
+    'Age_of_universe':4.34842e17,
+    'mass_sun':1.9891e30,
+    'mass_earth':5.97219e24,
     
 }
 
@@ -208,12 +241,49 @@ special_cases = {
 imp_units = units.copy()
 
 
-badunitsforimperialdisplay = ['rotations','degrees','°', 'pi','eV','G (gravitational constant)','mole',]
+
+def addvalue(name,pre_existing_unit,value):
+    for [n,p,v] in zip(name,pre_existing_unit,value):
+        #print(n,p,v)
+        mltav  = units[p]
+        
+        special_cases[n] = v
+        
+        units[n] = mltav
+        #print(units)
+
+addvalue(
+    ['orbit_moon',
+        ],
+    ['m',
+        ],
+    [384400000,
+        ]
+    )
+
+
+badunitsforimperialdisplay = ['rotations','degrees','°', 'pi','eV','G_gravitational constant','mole','acre','m\u00b2','H_0','mass_sun','mass_earth','Age_of_universe']
 for x in badunitsforimperialdisplay:
     del imp_units[x]
 
 
-synonyms = {'rotations':'rot','rot':'rotation','°':'degrees','degrees':'deg','hour':'hours','yr':'years','gallon':'gallons','mile':'miles','lb_mass':'lbm','day':'days','pi':'π','s':'sec','sec':'second','liter':'L','amu':'Atomic Mass Unit','Coulomb constant':'k_e','cal':'kcal'}
+synonyms = {'rotations':'rot','rot':'rotation','°':'degrees','degrees':'deg','hour':'hours','yr':'years','gallon':'gallons','mile':'miles','lb_mass':'lbm','day':'days','pi':'π','s':'sec','sec':'second','liter':'L','amu':'Atomic Mass Unit','Coulomb constant':'k_e','cal':'kcal','G_gravitational constant':'G'}
+
+superscript = {
+    -5: "\u207b\u2075",
+    -4: "\u207b\u2074",
+    -3: "\u207b\u00b3",
+    -2: "\u207b\u00b2",
+    -1: "\u207b\u00b9",
+    0: "\u2070",
+    1: "\u00b9",
+    2: "\u00b2",
+    3: "\u00b3",
+    4: "\u2074",
+    5: "\u2075"
+}
+
+
 
 for s in synonyms:
     #print(s)
@@ -226,14 +296,31 @@ for s in synonyms:
 def interms_str_imp(a,b):
     X = b
     # a = ['g','m','s','A','K']
-    num = ' '
+    num = ''
     for x in range(mlta):
         if X[x] == 1:
             num += (' '+a[x]+' ×')
         elif X[x] != 0:
-            num += (' '+a[x]+'^'+str(int(X[x]))+' ×')
-    if num != ' ':
+            num += (' '+a[x]+superscript[X[x]]+' ×')
+    if num != '':
         if num[-1]=='×':
+            num = num[0:-1]
+
+    return num
+
+def interms_str_con(a,b):
+    X = b
+    # a = ['g','m','s','A','K']
+    
+    
+    num = ''
+    for x in range(mlta):
+        if X[x] == 1:
+            num += (''+a[x]+'⋅')
+        elif X[x] != 0:
+            num += (''+a[x]+superscript[X[x]]+'⋅')
+    if num != '':
+        if num[-1]=='⋅':
             num = num[0:-1]
 
     return num
@@ -285,6 +372,12 @@ special_cases_list = list(special_cases.items())
 
 special_cases = {us[0].replace(' ',''):us[1] for us in special_cases_list}
 
+
+
+
+
+
+
 def get_len(key):
     return -len(key[0])
 test_dict = units
@@ -326,6 +419,26 @@ def find_p_imp(v):
     for p in list(prefixes2):
     
         c = prefixes2[p]
+        vc = v/c
+        
+        #print('v',v,'c',c,'vc',vc,'best',best,'p',p)
+        if vc<best and vc>=.99:
+            prefix = p
+            best = vc+0
+    return prefix
+
+def find_p_con(v):
+    
+    best = 100000000000000
+    prefix = ''
+    # v = round(v,6)
+    
+    
+    if v > .01 and v < 10000:
+        return ''
+    for p in list(prefixescon):
+    
+        c = prefixescon[p]
         vc = v/c
         
         #print('v',v,'c',c,'vc',vc,'best',best,'p',p)
@@ -383,7 +496,7 @@ class Value:
         if u_string in special_cases:
             self.value *= special_cases[u_string]
         
-        # if u_string == 'm^3':
+        # if u_string == 'm\u00b3':
         #     self.value = self.value**(1/3)
     
     def set_prefix(self,p_string):
@@ -393,13 +506,13 @@ class Value:
         
         self.value *= prefixes[p_string]
         
-        if self.original_unit == 'm^3':
+        if self.original_unit == 'm\u00b3':
             self.value *= prefixes[p_string]
             self.value *= prefixes[p_string]
         
     def show(self):
-        pass
-        #print(self.value,self.prefix,self.original_unit,'     ',self.mlta_vector)
+        
+        print(self.value,self.prefix,self.original_unit,'     ',self.mlta_vector)
 
     def in_terms_metric(self):
         unit = ''
@@ -419,7 +532,7 @@ class Value:
         if u_string in special_cases:
             v /= special_cases[u_string]
         
-        # if u_string == 'm^3':
+        # if u_string == 'm\u00b3':
         #     v = v ** (3)
         return v
     
@@ -441,12 +554,24 @@ class Value:
         v = self.get_value_in_terms(u)
         if u == '':
             u = interms_str_imp(['slug','ft','s','A','K'],self.mlta_vector)
-            v *= np.prod(vec([14.59390,0.3048,1,1,5/9])**self.mlta_vector)
+            v *= np.prod(1/vec([14.59390,0.3048,1,1,5/9])**self.mlta_vector)
             
         p = find_p_imp(v)
         v /= prefixes2[p]
         
         return str(round(v,5))+p+u
+    
+    def show_in_terms_con(self):
+        
+        u = interms_str_con(['kg','m','s','A','K'],self.mlta_vector)
+        v = self.get_value_in_terms(u)
+        
+        
+        
+        p = find_p_con(v)
+        
+        v/= prefixescon[p]
+        return str(round(v,5))+ p+' '+u
     
     def show_in_terms(self):
         
@@ -456,18 +581,22 @@ class Value:
         v = self.get_value_in_terms(u)
 
         if u == '':
-            u = interms_str(['g','m','s','A','K'],self.mlta_vector)
+            u = interms_str(['kg','m','s','A','K'],self.mlta_vector)
         
-        if u == 'm^3':
+        if u == 'm\u00b3':
             p = find_p(v**(1/3))
+        elif u == 'm\u00b2':
+            p = find_p(v**(1/2))
         else:
             p = find_p(v)
         
         
         v /= prefixes[p]
         
-        if u == 'm^3':
+        if u == 'm\u00b3':
             v/=prefixes[p]
+            v/=prefixes[p]
+        elif u == 'm\u00b2':
             v/=prefixes[p]
         
         #print(round(v,5),p+u)
@@ -482,10 +611,25 @@ def break_into_terms(a):
         a = a.replace(x,x.replace('/','per'))
     
     a = a.replace('×','*')
-    
+    a = a.replace('⋅','*')
     a = a.replace('÷','/')
     a = a.replace('to','/')
-        
+    
+    
+    if '/(' in a:
+        #print('found grouping')
+        if ')' in a:
+            ap = a.split('/(')[1]
+            app = ap.split(')')[0]
+            
+            app2 = app.replace('/','÷')
+            app2 = app2.replace('*','/')
+            app2 = app2.replace('÷','*')
+            a = a.replace(app,app2)
+            a = a.replace('/(','/')
+            a = a.replace(')','')
+    
+    
     terms=[]
     for e in a.split('*'):
         if e:
