@@ -5,6 +5,8 @@ def vec(x):
     return np.array(x,dtype =np.float64)
 def inv(x):
     return np.linalg.inv(x)
+    
+
 
 prefixes ={
     #'Mol':'6.02214076e+23',
@@ -44,15 +46,22 @@ superscript_map = {
     '6': "\u2076",
     '7': "\u2077",
     '8': "\u2078",
-    '9': "\u2079"
+    '9': "\u2079",
+    '.': "\u22C5"
 }
 
 def to_superscript(number):
-    return ''.join([superscript_map[char] for char in str(number)])
+    s = str(number)
+    l = len(s)
+    if s[l-2:l] == ".0":
+        s = s[0:l-2]
+    return ''.join([superscript_map[char] for char in s])
 
 prefixes2 = {'': 1, **{'×10' + to_superscript(x) + ' ': 10**x for x in range(-46, 46)}}
 
 prefixescon = {'':1, **{'e'+str(x)+' ':10**x  for x in range(-46,46)}}
+superscript = {**{ x:to_superscript(x) for x in range(-46, 46)}}
+
 
 for p in range(len(prefixes)):
     ind = list(prefixes)[p]
@@ -63,7 +72,6 @@ for p in range(len(prefixes)):
 
 mlta = 5
 
-special_case_div_symbol = ['kg/s','m/s','g/m\u00b3','kg/m\u00b3','m/s\u00b2']
 
 units =  {
     '':         vec([0,0,0,0,0]),
@@ -87,7 +95,7 @@ units =  {
     'g/m\u00b3':    vec([1,-3,0,0,0]),
     'kg/m\u00b3':   vec([1,-3,0,0,0]),
     'm/s\u00b2':    vec([0,1,-2,0,0]),
-    's\u00b2':      vec([0,0,2,0,0]),
+    # 's\u00b2':      vec([0,0,2,0,0]),
     'g_earth':  vec([0,1,-2,0,0]),
     'c_speed of light': vec([0,1,-1,0,0]),
     'atm' :     vec([1,1-2,-2,0,0]),
@@ -170,7 +178,9 @@ units =  {
 
 
 
+special_case_div_symbol = ['kg/s','m/s','g/m\u00b3','g/m^3','kg/m\u00b3','m/s\u00b2','m/s^2']
 
+special_case_exponents = ['g/m\u00b3','g/m^3','kg/m\u00b3','m/s\u00b2','m/s^2']
 
 
 special_case_grams = ['g','g/m\u00b3']
@@ -192,8 +202,8 @@ special_cases = {
     'hour':         60*60,
     'hr':           60*60,
     'day':          60*60*24,
-    'year':         3.154*10**7,
-    'yr':           3.154*10**7,
+    'year':         3.154e7,
+    'yr':           3.154e7,
     'c_speed of light':299792458,
     'liter':        0.001,
     'gallon':       0.00378541,
@@ -203,7 +213,7 @@ special_cases = {
     'degrees':      np.pi*2/360,
     '°':            np.pi*2/360,
     'rotations':    np.pi*2,
-    'AU':           1.495978*10**11,
+    'AU':           1.495978e11,
     'RPM':          2*np.pi/60,
     'rpm':          2*np.pi/60,
     'in':           .3048/12,
@@ -253,11 +263,11 @@ def addvalue(name,pre_existing_unit,value):
         #print(units)
 
 addvalue(
-    ['orbit_moon',
+    ['orbit_moon','slug','mass_moon'
         ],
-    ['m',
+    ['m','kg','kg'
         ],
-    [384400000,
+    [384400000,14.59390,7.3476730e22
         ]
     )
 
@@ -267,21 +277,8 @@ for x in badunitsforimperialdisplay:
     del imp_units[x]
 
 
-synonyms = {'rotations':'rot','rot':'rotation','°':'degrees','degrees':'deg','hour':'hours','yr':'years','gallon':'gallons','mile':'miles','lb_mass':'lbm','day':'days','pi':'π','s':'sec','sec':'second','liter':'L','amu':'Atomic Mass Unit','Coulomb constant':'k_e','cal':'kcal','G_gravitational constant':'G'}
+synonyms = {'rotations':'rot','rot':'rotation','°':'degrees','degrees':'deg','hour':'hours','yr':'years','gallon':'gallons','mile':'miles','lb_mass':'lbm','day':'days','pi':'π','s':'sec','sec':'second','liter':'L','amu':'Atomic Mass Unit','Coulomb constant':'k_e','cal':'kcal','G_gravitational constant':'G','m\u00b3':'m^3','m\u00b2':'m^2','m/s\u00b2':'m/s^2','Btu':'BTU','hour':'h'}
 
-superscript = {
-    -5: "\u207b\u2075",
-    -4: "\u207b\u2074",
-    -3: "\u207b\u00b3",
-    -2: "\u207b\u00b2",
-    -1: "\u207b\u00b9",
-    0: "\u2070",
-    1: "\u00b9",
-    2: "\u00b2",
-    3: "\u00b3",
-    4: "\u2074",
-    5: "\u2075"
-}
 
 
 
@@ -301,7 +298,7 @@ def interms_str_imp(a,b):
         if X[x] == 1:
             num += (' '+a[x]+' ×')
         elif X[x] != 0:
-            num += (' '+a[x]+superscript[X[x]]+' ×')
+            num += (' '+a[x]+to_superscript(X[x])+' ×')
     if num != '':
         if num[-1]=='×':
             num = num[0:-1]
@@ -318,7 +315,8 @@ def interms_str_con(a,b):
         if X[x] == 1:
             num += (''+a[x]+'⋅')
         elif X[x] != 0:
-            num += (''+a[x]+superscript[X[x]]+'⋅')
+            #print(x)
+            num += (''+a[x]+to_superscript(X[x])+'⋅')
     if num != '':
         if num[-1]=='⋅':
             num = num[0:-1]
@@ -421,7 +419,7 @@ def find_p_imp(v):
         c = prefixes2[p]
         vc = v/c
         
-        #print('v',v,'c',c,'vc',vc,'best',best,'p',p)
+        
         if vc<best and vc>=.99:
             prefix = p
             best = vc+0
@@ -487,24 +485,24 @@ class Value:
         
         self.prefix = ''
     
-    def set_unit(self,u_string):
+    def set_unit(self,u_string,exponent = 1):
         
         self.original_unit = u_string
         
-        self.mlta_vector = units[u_string]
+        self.mlta_vector = units[u_string]*exponent
         
         if u_string in special_cases:
-            self.value *= special_cases[u_string]
+            self.value *= special_cases[u_string]**exponent
         
         # if u_string == 'm\u00b3':
         #     self.value = self.value**(1/3)
     
-    def set_prefix(self,p_string):
+    def set_prefix(self,p_string,exponent=1):
         self.prefix = p_string
         
         
         
-        self.value *= prefixes[p_string]
+        self.value *= prefixes[p_string]**exponent
         
         if self.original_unit == 'm\u00b3':
             self.value *= prefixes[p_string]
@@ -563,7 +561,8 @@ class Value:
     
     def show_in_terms_con(self):
         
-        u = interms_str_con(['kg','m','s','A','K'],self.mlta_vector)
+        #print(self.mlta_vector)
+        u = interms_str_con(['kg','m','s','A','K'],self.mlta_vector+0)
         v = self.get_value_in_terms(u)
         
         
@@ -582,6 +581,11 @@ class Value:
 
         if u == '':
             u = interms_str(['kg','m','s','A','K'],self.mlta_vector)
+        #print(u[0:2])
+        if u[0:2] == "kg":
+            #print('yes')
+            u = u[1:len(u)]
+            v *= 1000
         
         if u == 'm\u00b3':
             p = find_p(v**(1/3))
@@ -605,11 +609,29 @@ class Value:
 
 import re
 
-def break_into_terms(a):
 
+
+
+def break_into_terms(a):
+    
+    
+    
+    for x in units:
+        if len(x) > 2 and not('/' in x) and not('^' in x):
+            
+            # print(x)
+            # print(a)
+            a = a.replace(x,' '+x+' ')
+            # print(a)
+    
+    for x in special_case_exponents:
+        a = a.replace(x,x.replace('^','exp'))
+    
     for x in special_case_div_symbol:
         a = a.replace(x,x.replace('/','per'))
+        
     
+    #print(a)
     a = a.replace('×','*')
     a = a.replace('⋅','*')
     a = a.replace('÷','/')
@@ -629,6 +651,11 @@ def break_into_terms(a):
             a = a.replace('/(','/')
             a = a.replace(')','')
     
+    # if '[' in a:
+    #     if ']^' in a:
+            
+    
+            
     
     terms=[]
     for e in a.split('*'):
@@ -655,6 +682,26 @@ def convert(terms):
         
         terms_values[c] = Value()
         
+        exponent = 1
+        value_exp = 1
+        
+        if '^' in t:
+            exp_str = t.split('^')[1]
+            
+            if len(exp_str)>0:
+                exponent = float(exp_str)
+                if ']^' in t:
+                    t = t.replace(']','')
+                    t = t.replace('[','')
+                    value_exp = exponent
+                t = t.split('^')[0]
+        
+        
+        
+        
+        t = t.replace('exp','^')
+        
+        
         #EXTRACT NUMBER VALUE
         
         val = ''
@@ -662,7 +709,7 @@ def convert(terms):
         for i in range(len(t)):
             if t[i] == '^' or t[i] == '_':
                 break
-            if t[i].isdigit() or t[i] == '.':
+            if t[i].isdigit() or t[i] == '.' or t[i] == '-' or t[i] == 'e':
                 val+=t[i]
                 numstart = True
             
@@ -673,7 +720,7 @@ def convert(terms):
         if val == '':
             val = '1'
         
-        terms_values[c].value = float(val)
+        terms_values[c].value = float(val)**value_exp
         
         
         
@@ -695,7 +742,7 @@ def convert(terms):
                 t = t[0:t_l-k_l]
                 break
         
-        terms_values[c].set_unit(un)
+        terms_values[c].set_unit(un,exponent)
         
         pref = ''
         
@@ -715,7 +762,7 @@ def convert(terms):
                 t = t[0:t_l]
                 break
         
-        terms_values[c].set_prefix(pref)
+        terms_values[c].set_prefix(pref,exponent)
         
         
         # Invert if division
@@ -723,6 +770,9 @@ def convert(terms):
         if t[0] == '/':
             terms_values[c].value = 1/terms_values[c].value
             terms_values[c].mlta_vector = - terms_values[c].mlta_vector
+        
+        #terms_values[c].mlta_vector  *= exponent
+        
         
     return terms_values
     
@@ -737,17 +787,3 @@ def mult(values):
         
         res.mlta_vector += v.mlta_vector
     return res
-
-
-
-terms = break_into_terms('30 m/s * 40 ms * 50 g * 500lb')
-terms_values = convert(terms)
-
-for x in terms_values:
-    x.show()
-
-
-RESULT = mult(terms_values)
-    
-RESULT.show_in_terms()
-
