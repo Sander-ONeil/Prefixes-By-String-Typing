@@ -40,6 +40,8 @@ def insert_character(char):
     on_key(None)  # Update the result
 
 
+help_string = "Use \"[ term ] ^ x\" for exponents like squaring or square roots and  \"val prefix unit ^ x\" for exponential units"
+
 m = 7
 root = tk.Tk()
 root.title('Live Text Display')
@@ -86,7 +88,7 @@ imperial_label.configure(bg=root.cget('bg'), relief="flat")
 
 
 
-con = tk.Text(root,height=1,width = 1, font=("Arial", 20)) # Font adjusted to make text bigger
+con = tk.Text(root,height=1,width = 1, font=("Arial", 15)) # Font adjusted to make text bigger
 
 con.tag_configure('center', justify='center')
 con.insert(1.0,'Base units','center')
@@ -119,6 +121,7 @@ button_text = ['×','÷','°','μ','π','Ω','Å','ε_0','k_e','H_0','c_speed of
     'Age_of_universe',
     'mass_sun',
     'mass_earth',
+    'mass_moon',
     'R_earth',
 
 ]
